@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROSMERIAN — Pusat Informasi Barang Hilang Sekolah</title>
+  <!-- Google Fonts: Plus Jakarta Sans untuk tampilan modern dan bersih -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome untuk ikon intuitif -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Stylesheet Utama ROSMERIAN -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand" onclick="app.resetFilters()">
+        <div class="brand-icon">
+          <i class="fa-solid fa-seedling"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">ROSMERIAN</span>
+          <span class="brand-sub">Lost & Found Sekolah</span>
+        </div>
+      </div>
+
+      <!-- Quick Search Bar di Desktop -->
+      <div class="nav-search">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Cari nama barang, lokasi, atau ciri khusus..." oninput="app.handleSearch(this.value)">
+        <button id="clearSearchBtn" class="clear-search-btn" onclick="app.clearSearch()" style="display:none;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Action & Profile Area -->
+      <div class="nav-actions">
+        <!-- Notification Bell Button -->
+        <button class="icon-btn" id="notifBellBtn" onclick="app.toggleNotifDrawer()" title="Pemberitahuan">
+          <i class="fa-regular fa-bell"></i>
+          <span class="badge-count" id="notifBadgeCount" style="display: none;">0</span>
+        </button>
+
+        <!-- User Authentication Box -->
+        <div id="authContainer">
+          <!-- Diisi secara dinamis oleh JavaScript: Tombol Login atau Profile Card -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="main-content">
+    
+    <!-- Hero Banner & Tombol Lapor Utama -->
+    <section class="hero-section">
+      <div class="hero-card">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <i class="fa-solid fa-shield-halved"></i> Terhubung Seluruh Siswa & Guru
+          </div>
+          <h1 class="hero-title">Kehilangan atau Menemukan Barang di Sekolah?</h1>
+          <p class="hero-desc">
+            Satu laporan Anda akan ternotifikasi langsung ke seluruh warga sekolah. Mari saling bantu menjaga kejujuran dan kepedulian bersama <strong>ROSMERIAN</strong>.
+          </p>
+          <div class="hero-buttons">
+            <button class="btn btn-danger-soft" onclick="app.openReportModal('lost')">
+              <i class="fa-solid fa-bullhorn"></i>
+              <span>Saya Kehilangan Barang</span>
+            </button>
+            <button class="btn btn-primary" onclick="app.openReportModal('found')">
+              <i class="fa-solid fa-hand-holding-heart"></i>
+              <span>Saya Menemukan Barang</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-box">
+            <span class="stat-number" id="statLostCount">0</span>
+            <span class="stat-label">Barang Hilang</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-box">
+            <span class="stat-number" id="statFoundCount">0</span>
+            <span class="stat-label">Barang Ditemukan</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-box">
+            <span class="stat-number" id="statResolvedCount">0</span>
+            <span class="stat-label">Berhasil Kembali</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter & Kategori Bar -->
+    <section class="filter-section">
+      <!-- Status Tabs -->
+      <div class="status-tabs">
+        <button class="tab-btn active" data-status="all" onclick="app.filterByStatus('all', this)">
+          <i class="fa-solid fa-border-all"></i> Semua
+        </button>
+        <button class="tab-btn" data-status="lost" onclick="app.filterByStatus('lost', this)">
+          <span class="dot dot-lost"></span> Hilang
+        </button>
+        <button class="tab-btn" data-status="found" onclick="app.filterByStatus('found', this)">
+          <span class="dot dot-found"></span> Ditemukan
+        </button>
+        <button class="tab-btn" data-status="resolved" onclick="app.filterByStatus('resolved', this)">
+          <span class="dot dot-resolved"></span> Selesai
+        </button>
+      </div>
+
+      <!-- Kategori Chips -->
+      <div class="category-scroll">
+        <button class="chip-btn active" data-category="all" onclick="app.filterByCategory('all', this)">
+          Semua Kategori
+        </button>
+        <button class="chip-btn" data-category="Elektronik" onclick="app.filterByCategory('Elektronik', this)">
+          <i class="fa-solid fa-mobile-screen"></i> Elektronik
+        </button>
+        <button class="chip-btn" data-category="Alat Tulis & Buku" onclick="app.filterByCategory('Alat Tulis & Buku', this)">
+          <i class="fa-solid fa-book"></i> Alat Tulis & Buku
+        </button>
+        <button class="chip-btn" data-category="Pakaian & Jaket" onclick="app.filterByCategory('Pakaian & Jaket', this)">
+          <i class="fa-solid fa-shirt"></i> Pakaian & Jaket
+        </button>
+        <button class="chip-btn" data-category="Dompet & Kartu" onclick="app.filterByCategory('Dompet & Kartu', this)">
+          <i class="fa-solid fa-id-card"></i> Dompet & Kartu
+        </button>
+        <button class="chip-btn" data-category="Kunci & Aksesori" onclick="app.filterByCategory('Kunci & Aksesori', this)">
+          <i class="fa-solid fa-key"></i> Kunci & Aksesori
+        </button>
+        <button class="chip-btn" data-category="Lainnya" onclick="app.filterByCategory('Lainnya', this)">
+          <i class="fa-solid fa-box-archive"></i> Lainnya
+        </button>
+      </div>
+    </section>
+
+    <!-- Feed Daftar Barang -->
+    <section class="feed-section">
+      <div class="feed-header">
+        <div class="feed-title-wrap">
+          <h2 class="feed-title" id="feedTitleHeading">Daftar Barang Terbaru</h2>
+          <span class="feed-count" id="feedItemCount">0 barang</span>
+        </div>
+        <div class="feed-sort">
+          <label for="sortSelect"><i class="fa-solid fa-arrow-down-wide-short"></i> Urutkan:</label>
+          <select id="sortSelect" onchange="app.handleSort(this.value)">
+            <option value="newest">Terbaru Dilaporkan</option>
+            <option value="oldest">Paling Lama</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Grid Kartu Barang -->
+      <div class="items-grid" id="itemsGrid">
+        <!-- Diisi secara dinamis oleh JavaScript -->
+      </div>
+
+      <!-- State Kosong jika tidak ada hasil -->
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <div class="empty-icon">
+          <i class="fa-solid fa-magnifying-glass-chart"></i>
+        </div>
+        <h3>Belum Ada Barang yang Cocok</h3>
+        <p>Coba gunakan kata kunci lain atau ubah filter kategori di atas.</p>
+        <button class="btn btn-outline" onclick="app.resetFilters()">Kembalikan Semua Filter</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= NOTIFICATION DRAWER ================= -->
+  <div class="drawer-overlay" id="notifOverlay" onclick="app.toggleNotifDrawer(false)"></div>
+  <aside class="notif-drawer" id="notifDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <i class="fa-solid fa-bell text-green"></i>
+        <h3>Notifikasi Siaran Sekolah</h3>
+      </div>
+      <div class="drawer-actions">
+        <button class="text-btn" onclick="app.markAllNotifsRead()">Tandai dibaca</button>
+        <button class="close-btn" onclick="app.toggleNotifDrawer(false)">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    <div class="drawer-browser-perm" id="browserPermBanner">
+      <i class="fa-solid fa-volume-high"></i>
+      <div class="perm-text">
+        <strong>Aktifkan Notifikasi Web</strong>
+        <span>Dapatkan peringatan langsung di layar HP/Laptop saat ada barang hilang.</span>
+      </div>
+      <button class="btn btn-sm btn-primary" onclick="app.requestBrowserNotification()">Aktifkan</button>
+    </div>
+    <div class="notif-list" id="notifList">
+      <!-- Diisi oleh JS -->
+    </div>
+  </aside>
+
+  <!-- ================= MODAL: LAPOR BARANG ================= -->
+  <div class="modal-backdrop" id="reportModalBackdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h3 id="reportModalTitle">Buat Laporan Barang</h3>
+          <p class="modal-subtitle">Semua siswa sekolah akan menerima pemberitahuan otomatis.</p>
+        </div>
+        <button class="close-btn" onclick="app.closeModal('reportModalBackdrop')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tipe Laporan Radio Selector -->
+        <div class="type-switch">
+          <label class="type-option" id="typeOptionLost">
+            <input type="radio" name="reportType" value="lost" onchange="app.switchReportType('lost')" checked>
+            <div class="type-card">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>Barang Hilang</span>
+            </div>
+          </label>
+          <label class="type-option" id="typeOptionFound">
+            <input type="radio" name="reportType" value="found" onchange="app.switchReportType('found')">
+            <div class="type-card">
+              <i class="fa-solid fa-hand-holding-heart"></i>
+              <span>Barang Ditemukan</span>
+            </div>
+          </label>
+        </div>
+
+        <form id="reportForm" onsubmit="app.submitReport(event)">
+          <!-- Nama Barang -->
+          <div class="form-group">
+            <label for="formItemTitle">Nama Barang <span class="required">*</span></label>
+            <input type="text" id="formItemTitle" placeholder="Contoh: Kunci Motor Beat Hitam / Kotak Pensil Faber Castell" required>
+          </div>
+
+          <!-- Kategori & Lokasi -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="formItemCategory">Kategori <span class="required">*</span></label>
+              <select id="formItemCategory" required>
+                <option value="" disabled selected>Pilih Kategori</option>
+                <option value="Elektronik">Elektronik (HP, Earphone, Flashdisk)</option>
+                <option value="Alat Tulis & Buku">Alat Tulis & Buku</option>
+                <option value="Pakaian & Jaket">Pakaian, Jaket & Topi</option>
+                <option value="Dompet & Kartu">Dompet, Uang & Kartu Pelajar</option>
+                <option value="Kunci & Aksesori">Kunci Motor/Rumah & Jam Tangan</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="formItemLocation" id="labelLocation">Lokasi Kejadian <span class="required">*</span></label>
+              <input type="text" id="formItemLocation" placeholder="Contoh: Depan Lab Komputer 2, Kantin, Lapangan Basket" required>
+            </div>
+          </div>
+
+          <!-- Waktu & Kontak -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="formItemDate">Waktu / Tanggal <span class="required">*</span></label>
+              <input type="date" id="formItemDate" required>
+            </div>
+            <div class="form-group">
+              <label for="formItemContact">Kontak / WhatsApp Pelapor <span class="required">*</span></label>
+              <input type="text" id="formItemContact" placeholder="08xxxxxxxxxx atau Akun IG" required>
+            </div>
+          </div>
+
+          <!-- Deskripsi Detail & Ciri-Ciri -->
+          <div class="form-group">
+            <label for="formItemDesc">Deskripsi & Ciri-Ciri Khusus <span class="required">*</span></label>
+            <textarea id="formItemDesc" rows="3" placeholder="Jelaskan ciri khusus, stiker, warna spesifik, gantungan kunci, atau goresan yang membedakannya..." required></textarea>
+          </div>
+
+          <!-- Tempat Penyimpanan (Khusus Barang Temuan) -->
+          <div class="form-group" id="groupHoldingLocation" style="display:none;">
+            <label for="formHoldingLocation">Di mana barang ini sekarang disimpan? <span class="required">*</span></label>
+            <select id="formHoldingLocation">
+              <option value="Dititipkan ke Meja Piket / Satpam">Dititipkan ke Meja Piket / Pos Satpam</option>
+              <option value="Dititipkan ke Ruang BK / Kesiswaan">Dititipkan ke Ruang BK / Kesiswaan</option>
+              <option value="Disimpan sendiri oleh penemu">Disimpan sendiri oleh saya (Penemu)</option>
+            </select>
+          </div>
+
+          <!-- Upload Foto Barang -->
+          <div class="form-group">
+            <label>Foto Barang (Opsional tapi sangat disarankan)</label>
+            <div class="photo-upload-box" onclick="document.getElementById('formItemPhoto').click()">
+              <input type="file" id="formItemPhoto" accept="image/*" style="display:none;" onchange="app.handlePhotoSelect(event)">
+              <div id="photoPreviewContainer" style="display:none;" class="photo-preview-wrap">
+                <img id="photoPreviewImg" src="" alt="Pratinjau Foto">
+                <button type="button" class="remove-photo-btn" onclick="app.removeSelectedPhoto(event)">
+                  <i class="fa-solid fa-trash-can"></i> Hapus Foto
+                </button>
+              </div>
+              <div id="photoPlaceholder" class="photo-placeholder">
+                <i class="fa-solid fa-cloud-arrow-up text-green"></i>
+                <span>Klik untuk unggah foto atau tangkapan kamera</span>
+                <small>Format JPG/PNG, ukuran maksimal 3MB</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" onclick="app.closeModal('reportModalBackdrop')">Batal</button>
+            <button type="submit" class="btn btn-primary" id="btnSubmitReport">
+              <i class="fa-solid fa-paper-plane"></i> Publikasikan Laporan
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: DETAIL & KLAIM BARANG ================= -->
+  <div class="modal-backdrop" id="detailModalBackdrop">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="badge" id="detailModalBadge">HILANG</span>
+          <h3 id="detailModalTitle">Detail Laporan</h3>
+        </div>
+        <button class="close-btn" onclick="app.closeModal('detailModalBackdrop')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="detail-layout">
+          <!-- Gambar Detail -->
+          <div class="detail-image-box">
+            <img id="detailModalImage" src="" alt="Foto Barang">
+            <div class="detail-holder-badge" id="detailHolderInfo" style="display:none;">
+              <i class="fa-solid fa-location-dot"></i>
+              <span id="detailHolderText">Disimpan di Meja Piket</span>
+            </div>
+          </div>
+
+          <!-- Rincian Informasi -->
+          <div class="detail-info-box">
+            <div class="detail-meta-grid">
+              <div class="meta-item">
+                <span class="meta-label"><i class="fa-solid fa-shapes"></i> Kategori</span>
+                <span class="meta-value" id="detailModalCategory">-</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label"><i class="fa-solid fa-location-crosshairs"></i> Lokasi</span>
+                <span class="meta-value" id="detailModalLocation">-</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label"><i class="fa-regular fa-calendar"></i> Tanggal</span>
+                <span class="meta-value" id="detailModalDate">-</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label"><i class="fa-regular fa-user"></i> Pelapor</span>
+                <span class="meta-value" id="detailModalReporter">-</span>
+              </div>
+            </div>
+
+            <div class="detail-desc-box">
+              <h4>Deskripsi & Ciri-Ciri:</h4>
+              <p id="detailModalDesc">-</p>
+            </div>
+
+            <!-- Bagian Aksi Verifikasi / Klaim -->
+            <div class="detail-action-section" id="detailActionSection">
+              <!-- Diisi secara dinamis sesuai status barang -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Verifikasi Klaim (Muncul jika tombol Klaim diklik) -->
+        <div class="claim-form-box" id="claimFormBox" style="display: none;">
+          <div class="claim-alert">
+            <i class="fa-solid fa-shield-check"></i>
+            <div>
+              <strong>Uji Verifikasi Kepemilikan (Anti-Klaim Palsu)</strong>
+              <p>Untuk memastikan barang kembali ke pemilik sah, sebutkan bukti atau ciri rahasia yang tidak tampak jelas pada foto umum.</p>
+            </div>
+          </div>
+          <form onsubmit="app.submitClaim(event)">
+            <div class="form-group">
+              <label for="claimProofInput">Jelaskan Bukti Kepemilikan Anda <span class="required">*</span></label>
+              <textarea id="claimProofInput" rows="3" placeholder="Misal: Nomor serial di belakang, isi detail di dalam dompet, gantungan kunci ada tulisan X, atau wallpaper layar kunci..." required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="claimContactInput">Nomor WhatsApp / ID Kontak Anda <span class="required">*</span></label>
+              <input type="text" id="claimContactInput" placeholder="08xxxxxxxxxx" required>
+            </div>
+            <div class="claim-form-actions">
+              <button type="button" class="btn btn-outline" onclick="app.toggleClaimForm(false)">Batal</button>
+              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Kirim Pengajuan Klaim</button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: GOOGLE SIGN-IN ================= -->
+  <div class="modal-backdrop" id="googleLoginModalBackdrop">
+    <div class="modal-card modal-sm">
+      <div class="modal-header text-center">
+        <div class="modal-title-group" style="width:100%;">
+          <div class="google-login-logo">
+            <svg viewBox="0 0 48 48" width="40" height="40">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+          </div>
+          <h3>Masuk Akun Siswa Google</h3>
+          <p class="modal-subtitle">Gunakan akun Google sekolah untuk identitas terpercaya.</p>
+        </div>
+        <button class="close-btn" onclick="app.closeModal('googleLoginModalBackdrop')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="google-acc-picker">
+          <!-- Pilihan Akun Siswa Cepat -->
+          <div class="acc-tile" onclick="app.loginAsDemo('Arga Rifaldhi', 'arga.rifaldhi@sekolah.sch.id', 'Kelas 11 RPL 1', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80')">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80" alt="Avatar">
+            <div class="acc-info">
+              <strong>Arga Rifaldhi</strong>
+              <span>arga.rifaldhi@sekolah.sch.id (11 RPL 1)</span>
+            </div>
+            <i class="fa-solid fa-arrow-right-to-bracket text-green"></i>
+          </div>
+
+          <div class="acc-tile" onclick="app.loginAsDemo('Siti Rahmawati', 'siti.rahma@sekolah.sch.id', 'Kelas 10 MIPA 2', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80')">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Avatar">
+            <div class="acc-info">
+              <strong>Siti Rahmawati</strong>
+              <span>siti.rahma@sekolah.sch.id (10 MIPA 2)</span>
+            </div>
+            <i class="fa-solid fa-arrow-right-to-bracket text-green"></i>
+          </div>
+
+          <div class="divider-text">
+            <span>atau masuk dengan akun lain</span>
+          </div>
+
+          <!-- Custom Google Entry -->
+          <form onsubmit="app.loginWithCustomGoogle(event)">
+            <div class="form-group">
+              <label for="customGoogleName">Nama Lengkap Siswa</label>
+              <input type="text" id="customGoogleName" placeholder="Contoh: Budi Santoso" required>
+            </div>
+            <div class="form-group">
+              <label for="customGoogleEmail">Email Google (@gmail / @sekolah.sch.id)</label>
+              <input type="email" id="customGoogleEmail" placeholder="nama@sekolah.sch.id" required>
+            </div>
+            <div class="form-group">
+              <label for="customGoogleClass">Kelas / Jurusan</label>
+              <input type="text" id="customGoogleClass" placeholder="Contoh: 12 TKJ 3" required>
+            </div>
+            <button type="submit" class="btn btn-google-full">
+              <i class="fa-brands fa-google"></i> Lanjutkan Masuk dengan Google
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOAST CONTAINER UNTUK BROADCAST LIVE ================= -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="brand-icon small">
+          <i class="fa-solid fa-seedling"></i>
+        </div>
+        <strong>ROSMERIAN</strong>
+        <span>• Sistem Informasi Kejujuran & Barang Hilang Sekolah</span>
+      </div>
+      <p class="footer-note">Didesain dengan Clean Emerald & White UI — Terbuka untuk seluruh siswa dan civitas akademika.</p>
+    </div>
+  </footer>
+
+  <!-- Script Aplikasi Utama -->
+  <script src="app.js"></script>
+</body>
+</html>
