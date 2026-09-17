@@ -395,7 +395,7 @@ const app = {
               <img class="reporter-avatar" src="${item.reporter?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'}" alt="Avatar">
               <span>${this.escapeHtml(item.reporter?.name || 'Siswa')}</span>
             </div>
-            <span class="text-btn">Detail & Klaim &rarr;</span>
+            <span class="action-arrow-tag">Detail & Klaim &rarr;</span>
           </div>
         </article>
       `;
@@ -745,11 +745,11 @@ const app = {
           <strong style="color:var(--lost-color); font-size:0.84rem;"><i class="fa-solid fa-phone"></i> Kontak Pelapor:</strong>
           <p style="font-size:0.88rem; font-weight:700; margin-top:0.2rem;">${this.escapeHtml(item.contact)}</p>
         </div>
-        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-          <a href="https://wa.me/${this.cleanPhoneForWa(item.contact)}" target="_blank" class="btn btn-primary" style="flex:1;">
+        <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+          <a href="https://wa.me/${this.cleanPhoneForWa(item.contact)}" target="_blank" class="btn btn-pill-primary" style="flex:1;">
             <i class="fa-brands fa-whatsapp"></i> Hubungi Pemilik di WA
           </a>
-          <button class="btn btn-outline" onclick="app.markItemResolved('${item.id}')" title="Jika barang sudah ditemukan dan kembali ke pemilik">
+          <button class="btn btn-pill-outline" onclick="app.markItemResolved('${item.id}')" title="Jika barang sudah ditemukan dan kembali ke pemilik">
             <i class="fa-solid fa-circle-check text-green"></i> Tandai Selesai
           </button>
         </div>
@@ -770,11 +770,11 @@ const app = {
           <strong style="color:var(--found-color); font-size:0.84rem;"><i class="fa-solid fa-box"></i> Lokasi Penyimpanan Saat Ini:</strong>
           <p style="font-size:0.88rem; font-weight:700; margin-top:0.2rem;">${this.escapeHtml(item.holdingLocation || 'Disimpan oleh penemu')}</p>
         </div>
-        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-          <button class="btn btn-primary" style="flex:1;" onclick="app.toggleClaimForm(true)">
+        <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+          <button class="btn btn-pill-primary" style="flex:1;" onclick="app.toggleClaimForm(true)">
             <i class="fa-solid fa-shield-halved"></i> Ini Barang Saya! (Ajukan Klaim)
           </button>
-          <button class="btn btn-outline" onclick="app.markItemResolved('${item.id}')">
+          <button class="btn btn-pill-outline" onclick="app.markItemResolved('${item.id}')">
             <i class="fa-solid fa-circle-check text-green"></i> Selesai Dikembalikan
           </button>
         </div>
